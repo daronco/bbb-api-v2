@@ -1,8 +1,23 @@
 class Meeting {
-    constructor({meetingId, name}) {
-        console.log("Creating the meeting:", {meetingId, name});
-        this.meetingId = meetingId;
-        this.name = name;
+    constructor(params) {
+        this.meetingId = params.meetingId;
+        this.name = params.name;
+        this.voiceBridge = params.voiceBridge;
+        this.dialNumber = params.dialNumber;
+        this.attendeePassword = params.attendeePassword;
+        this.moderatorPassword = params.moderatorPassword;
+        this.duration = params.duration;
+        this.recording = params.recording;
+        this.maxUsers = params.maxUsers;
+        this.metadata = params.metadata;
+        this.uniqueMeetingId = `${this.meetingId}-${new Date().getTime()}`;
+        this.createdAt = new Date().toISOString();
+        this.running = false;
+        this.startedAt = null;
+        this.endedAt = null;
+        this.hasBeenForciblyEnded = false;
+        this.isBreakout = false;
+        console.log("Creating the meeting:", this);
     }
 
     // users() {
@@ -11,6 +26,12 @@ class Meeting {
 
     static all() {
         return allMeetings;
+    }
+
+    static find(meetingId) {
+        return [allMeetings.find((e) => {
+            return e.meetingId.toString() === meetingId.toString();
+        })];
     }
 
     static add(meeting) {

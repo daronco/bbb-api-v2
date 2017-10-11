@@ -7,6 +7,7 @@ var app = express();
 app.use('/graphql', graphqlHTTP({
     schema: schema,
     rootValue: resolvers,
+    pretty: true,
     graphiql: true,
 }));
 app.listen(4000);
