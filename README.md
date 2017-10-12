@@ -14,7 +14,7 @@ curl -H "Content-Type:application/graphql" -X POST -d 'mutation { createMeeting(
 
 Queries
 
-```json
+```graphql
 {
   meetings {
     meetingId
@@ -27,11 +27,11 @@ Queries
       name
       value
     }
-	}
+  }
 }
 ```
 
-```json
+```graphql
 {
   meetings {
     uniqueMeetingId
@@ -40,7 +40,7 @@ Queries
 }
 ```
 
-```json
+```graphql
 mutation {
   createMeeting(params: {
     meetingId: "pedro-meeting",
