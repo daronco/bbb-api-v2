@@ -45,7 +45,7 @@ var schema = buildSchema(`
   }
 
   type Query {
-    meetings(meetingId: String): [Meeting]
+    meetings(uniqueMeetingId: String): [Meeting]
   }
 
   type Mutation {

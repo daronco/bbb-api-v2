@@ -2,9 +2,9 @@ const Brain = require('../lib/brain');
 
 // The root provides a resolver function for each API endpoint
 module.exports = {
-    meetings: ({meetingId}) => {
-        console.log("Received meetings with", meetingId);
-        return Brain.meetings(meetingId);
+    meetings: ({uniqueMeetingId}) => {
+        console.log("Received meetings with", uniqueMeetingId);
+        return Brain.meetings(uniqueMeetingId);
     },
     createMeeting: ({params}) => {
         console.log("Received createMeeting with", params);

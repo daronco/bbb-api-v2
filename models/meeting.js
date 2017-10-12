@@ -25,20 +25,23 @@ class Meeting {
     // }
 
     static all() {
-        return allMeetings;
+        return Object.values(allMeetings);
     }
 
-    static find(meetingId) {
-        return [allMeetings.find((e) => {
-            return e.meetingId.toString() === meetingId.toString();
-        })];
+    static find(uniqueMeetingId) {
+        return allMeetings[uniqueMeetingId];
     }
 
     static add(meeting) {
-        allMeetings.push(meeting);
+        allMeetings[meeting.uniqueMeetingId] = meeting;
     }
 }
 
-var allMeetings = [1, 2, 3, 4].map(i => new Meeting({meetingId: i, name: `Meeting ${i}`}));
+var allMeetings = [1, 2, 3, 4, 5].map(
+    i => new Meeting({meetingId: i, name: `Meeting ${i}`})
+).reduce((acc, item, _) => {
+    acc[item.uniqueMeetingId] = item;
+    return acc;
+}, {});
 
 module.exports = Meeting;
