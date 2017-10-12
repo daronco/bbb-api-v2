@@ -1,6 +1,11 @@
 var { buildSchema } = require('graphql');
 
 var schema = buildSchema(`
+  enum ROLE {
+    ATTENDEE
+    MODERATOR
+  }
+
   type Meeting {
     meetingId: String!
     uniqueMeetingId: String
@@ -19,11 +24,23 @@ var schema = buildSchema(`
     maxUsers: Int
     isBreakout: Boolean
     metadata: [Metadata]
+    users: [User]
   }
 
   type Metadata {
     name: String!
     value: String!
+  }
+
+  type User {
+    userId: String!
+    uniqueUserId: String
+    fullName: String!
+    role: ROLE
+    isPresenter: Boolean
+    isListeningOnly: Boolean
+    hasJoinedVoice: Boolean
+    hasVideo: Boolean
   }
 
   input MeetingInput {
@@ -46,19 +63,12 @@ var schema = buildSchema(`
 
   type Query {
     meetings(uniqueMeetingId: String): [Meeting]
+    users(uniqueUserId: String): [User]
   }
 
   type Mutation {
     createMeeting(params: MeetingInput): Meeting
   }
 `);
-
-// to put on User
-// <participantCount>0</participantCount>
-// <listenerCount>0</listenerCount>
-// <voiceParticipantCount>0</voiceParticipantCount>
-// <videoCount>0</videoCount>
-// <moderatorCount>0</moderatorCount>
-
 
 module.exports = schema;

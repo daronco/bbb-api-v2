@@ -18,14 +18,17 @@ Queries
 {
   meetings {
     meetingId
+    uniqueMeetingId
     name
-    duration
-    dialNumber
-    attendePassword
-    moderatorPassword
     metadata {
       name
       value
+    }
+    users {
+      userId
+      uniqueUserId
+      fullName
+      role
     }
   }
 }

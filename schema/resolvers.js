@@ -10,4 +10,8 @@ module.exports = {
         console.log("Received createMeeting with", params);
         return Brain.createMeeting(params);
     },
+    users: ({uniqueUserId}) => {
+        console.log("Received users with", uniqueUserId);
+        return Brain.users(uniqueUserId);
+    },
 };

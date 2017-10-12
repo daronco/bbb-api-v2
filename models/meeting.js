@@ -20,6 +20,13 @@ class Meeting {
         console.log("Creating the meeting:", this);
     }
 
+    users() {
+        const uniqueMeetingId = this.uniqueMeetingId;
+        return require('./user').all().filter(
+            u => u.uniqueMeetingId === uniqueMeetingId
+        );
+    }
+
     // users() {
     //     return Math.floor(Math.random() * 10);
     // }
@@ -35,10 +42,16 @@ class Meeting {
     static add(meeting) {
         allMeetings[meeting.uniqueMeetingId] = meeting;
     }
+
+    static any() {
+        var keys = Object.keys(allMeetings);
+        var selected = keys[Math.floor(Math.random() * keys.length)];
+        return allMeetings[selected];
+    }
 }
 
 var allMeetings = [1, 2, 3, 4, 5].map(
-    i => new Meeting({meetingId: i, name: `Meeting ${i}`})
+    i => new Meeting({meetingId: `meeting-${i}`, name: `Meeting ${i}`})
 ).reduce((acc, item, _) => {
     acc[item.uniqueMeetingId] = item;
     return acc;
