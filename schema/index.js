@@ -40,6 +40,8 @@ const typeDefs = `
     isListeningOnly: Boolean
     hasJoinedVoice: Boolean
     hasVideo: Boolean
+    authToken: String
+    sessionToken: String
   }
 
   input MeetingInput {

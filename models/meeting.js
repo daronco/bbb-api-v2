@@ -1,5 +1,6 @@
 const database = require('../lib/database');
 const redis = require("redis");
+const crypto = require("crypto");
 
 class Meeting {
   constructor(params) {
@@ -14,12 +15,15 @@ class Meeting {
     this.maxUsers = params.maxUsers || 0;
     this.metadata = params.metadata || {};
     this.isBreakout = params.isBreakout || false;
-    this.uniqueMeetingId = params.uniqueMeetingId || `${this.meetingId}-${new Date().getTime()}`;
     this.createdAt = params.createdAt || new Date().toISOString();
     this.running = params.running || false;
     this.startedAt = params.startedAt || null;
     this.endedAt = params.endedAt || null;
     this.hasBeenForciblyEnded = params.hasBeenForciblyEnded || false;
+
+    let defaultId = crypto.createHash('sha1').update(this.meetingId).digest('hex');
+    this.uniqueMeetingId = params.uniqueMeetingId || `${defaultId}-${new Date().getTime()}`;
+
     console.log("Creating the meeting:", this);
   }
 

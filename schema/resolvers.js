@@ -30,5 +30,5 @@ module.exports = {
       console.log("Received createUser with", params);
       return Brain.createUser(params);
     },
-  }
+  },
 };
