@@ -14,14 +14,21 @@ module.exports = {
       return Brain.meetings(uniqueMeetingId);
     },
 
-    // createMeeting: ({params}) => {
-    //   console.log("Received createMeeting with", params);
-    //   return Brain.createMeeting(params);
-    // },
-
     users: (_, {uniqueUserId}) => {
       console.log("Received users with", uniqueUserId);
       return Brain.users(uniqueUserId);
     },
   },
+
+  Mutation: {
+    createMeeting: (_, {params}) => {
+      console.log("Received createMeeting with", params);
+      return Brain.createMeeting(params);
+    },
+
+    createUser: (_, {params}) => {
+      console.log("Received createUser with", params);
+      return Brain.createUser(params);
+    },
+  }
 };

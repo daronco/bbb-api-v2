@@ -1,17 +1,55 @@
 const database = require('../lib/database');
+const redis = require("redis");
+const crypto = require("crypto");
 
 class User {
   constructor(params) {
-    this.userId = params.userId;
+    this.userId = params.userId || crypto.randomBytes(8).toString('hex');
     this.uniqueUserId = params.uniqueUserId || `${this.userId}-${new Date().getTime()}`;
-    this.uniqueMeetingId = params.uniqueMeetingId;
-    this.fullName = params.fullName;
-    this.role = params.role;
+    this.uniqueMeetingId = params.uniqueMeetingId || "";
+    this.fullName = params.fullName || crypto.randomBytes(20).toString('hex');
+    this.role = params.role || 'ATTENDEE';
     this.isPresenter = params.isPresenter || false;
     this.isListeningOnly = params.isListeningOnly || false;
     this.hasJoinedVoice = params.hasJoinedVoice || false;
     this.hasVideo = params.hasVideo || false;
     console.log("Creating the user:", this);
+  }
+
+  createOnBBB() {
+    return new Promise((resolve, reject) => {
+      let message = this.getCreateMessage();
+      let client = redis.createClient(6379, '10.0.3.244');
+      client.publish("to-akka-apps-redis-channel", JSON.stringify(message));
+      // TODO: wait for the user to be in the db and update it from there to return
+      client.quit();
+      resolve(this);
+
+      // TODO: create a session token to return on /enter
+    });
+  }
+
+  getCreateMessage() {
+    return {
+      envelope: { name: 'RegisterUserReqMsg', routing: { sender: 'bbb-web' } },
+      core: {
+        header: {
+          name: 'RegisterUserReqMsg',
+          meetingId: this.uniqueMeetingId
+        },
+        body: {
+          meetingId: this.uniqueMeetingId,
+          intUserId: this.uniqueUserId,
+          name: this.fullName,
+          role: this.role,      // TODO: attendee
+          extUserId: this.userId,
+          authToken: crypto.randomBytes(16).toString('hex'),
+          avatarURL: 'http://10.0.3.244/client/avatar.png',
+          guest: false,
+          authed: false
+        }
+      }
+    };
   }
 
   static all() {

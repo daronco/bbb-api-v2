@@ -32,6 +32,7 @@ const typeDefs = `
 
   type User {
     userId: String!
+    uniqueMeetingId: String!
     uniqueUserId: String
     fullName: String!
     role: ROLE
@@ -51,12 +52,14 @@ const typeDefs = `
     duration: Int
     recording: Boolean
     maxUsers: Int
-    metadata: [MetadataInput]
+    metadata: JSON
   }
 
-  input MetadataInput {
-    name: String!
-    value: String!
+  input UserInput {
+    uniqueMeetingId: String!
+    fullName: String!
+    role: ROLE
+    userId: String
   }
 
   type Query {
@@ -66,6 +69,7 @@ const typeDefs = `
 
   type Mutation {
     createMeeting(params: MeetingInput): Meeting
+    createUser(params: UserInput): User
   }
 `;
 

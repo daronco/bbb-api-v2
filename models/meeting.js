@@ -1,18 +1,19 @@
 const database = require('../lib/database');
+const redis = require("redis");
 
 class Meeting {
   constructor(params) {
-    this.meetingId = params.meetingId;
-    this.name = params.name;
-    this.voiceBridge = params.voiceBridge;
-    this.dialNumber = params.dialNumber;
-    this.attendeePassword = params.attendeePassword;
-    this.moderatorPassword = params.moderatorPassword;
-    this.duration = params.duration;
-    this.recording = params.recording;
-    this.maxUsers = params.maxUsers;
-    this.metadata = params.metadata;
-    this.isBreakout = params.isBreakout;
+    this.meetingId = params.meetingId || "";
+    this.name = params.name || "";
+    this.voiceBridge = params.voiceBridge || "";
+    this.dialNumber = params.dialNumber || 0;
+    this.attendeePassword = params.attendeePassword || "ap";
+    this.moderatorPassword = params.moderatorPassword || "mp";
+    this.duration = params.duration || 0;
+    this.recording = params.recording || false;
+    this.maxUsers = params.maxUsers || 0;
+    this.metadata = params.metadata || {};
+    this.isBreakout = params.isBreakout || false;
     this.uniqueMeetingId = params.uniqueMeetingId || `${this.meetingId}-${new Date().getTime()}`;
     this.createdAt = params.createdAt || new Date().toISOString();
     this.running = params.running || false;
@@ -24,6 +25,78 @@ class Meeting {
 
   users() {
     return require('./user').inMeeting(this.uniqueMeetingId);
+  }
+
+  createOnBBB() {
+    return new Promise((resolve, reject) => {
+      let message = this.getCreateMessage();
+      let client = redis.createClient(6379, '10.0.3.244');
+      client.publish("to-akka-apps-redis-channel", JSON.stringify(message));
+      // TODO: wait for the meeting to be in the db and update it from there to return
+      client.quit();
+      resolve(this);
+    });
+  }
+
+  getCreateMessage() {
+    return {
+      envelope: { name: 'CreateMeetingReqMsg', routing: { sender: 'bbb-web' } },
+      core: {
+        header: {
+          name: 'CreateMeetingReqMsg'
+        },
+        body: {
+          props: {
+            meetingProp: {
+              name: this.name,
+              extId: this.meetingId,
+              intId: this.uniqueMeetingId,
+              isBreakout: this.isBreakout
+            },
+            breakoutProps: { parentId: 'bbb-none', sequence: 0, breakoutRooms: [] },
+            durationProps: {
+              duration: 0,
+              createdTime: new Date().getTime(),
+              createdDate: new Date().toString(),
+              maxInactivityTimeoutMinutes: 120,
+              warnMinutesBeforeMax: 5,
+              meetingExpireIfNoUserJoinedInMinutes: 5,
+              meetingExpireWhenLastUserLeftInMinutes: 1
+            },
+            password: {
+              moderatorPass: this.moderatorPassword,
+              viewerPass: this.attendeePassword
+            },
+            recordProp: {
+              record: this.recording,
+              autoStartRecording: false,
+              allowStartStopRecording: true
+            },
+            welcomeProp: {
+              welcomeMsgTemplate: '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>This server is running <a href="http://docs.bigbluebutton.org/" target="_blank"><u>BigBlueButton</u></a>.',
+              welcomeMsg: '<br>Welcome to <b>random-805526</b>!<br><br>This server is running <a href="http://docs.bigbluebutton.org/" target="_blank"><u>BigBlueButton</u></a>.',
+              modOnlyMessage: ''
+            },
+            voiceProp: {
+              telVoice: this.voiceBridge.toString(),
+              voiceConf: this.voiceBridge.toString(),
+              dialNumber: this.dialNumber
+            },
+            usersProp: {
+              maxUsers: this.maxUsers,
+              webcamsOnlyForModerator: false,
+              guestPolicy: 'ASK_MODERATOR'
+            },
+            metadataProp: { metadata: this.metadata },
+            screenshareProps: {
+              screenshareConf: '70097-SCREENSHARE',
+              red5ScreenshareIp: '10.0.3.244',
+              red5ScreenshareApp: 'video-broadcast'
+            }
+          }
+        }
+      }
+    };
   }
 
   static all() {
