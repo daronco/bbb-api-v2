@@ -1,14 +1,21 @@
-var express = require('express');
-var graphqlHTTP = require('express-graphql');
-const schema = require('./schema');
-const resolvers = require('./schema/resolvers');
+const express = require('express');
+const bodyParser = require('body-parser');
+const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 
-var app = express();
-app.use('/graphql', graphqlHTTP({
-    schema: schema,
-    rootValue: resolvers,
-    pretty: true,
-    graphiql: true,
-}));
-app.listen(4000);
-console.log('Running a GraphQL API server at localhost:4000/graphql');
+const schema = require('./schema');
+const database = require('./lib/database');
+
+const PORT = 4000;
+
+database.connect((err, _) => {
+  var app = express();
+  app.use('/graphql', bodyParser.json(), graphqlExpress({schema}));
+  app.use('/graphiql', graphiqlExpress({
+    endpointURL: '/graphql',
+  }));
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}.`)
+  });
+
+  // database.close();
+});

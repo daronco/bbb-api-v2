@@ -1,10 +1,13 @@
-var { buildSchema } = require('graphql');
+const { makeExecutableSchema } = require('graphql-tools');
+const resolvers = require('./resolvers');
 
-var schema = buildSchema(`
+const typeDefs = `
   enum ROLE {
     ATTENDEE
     MODERATOR
   }
+
+  scalar JSON
 
   type Meeting {
     meetingId: String!
@@ -23,13 +26,8 @@ var schema = buildSchema(`
     hasBeenForciblyEnded: Boolean
     maxUsers: Int
     isBreakout: Boolean
-    metadata: [Metadata]
+    metadata: JSON
     users: [User]
-  }
-
-  type Metadata {
-    name: String!
-    value: String!
   }
 
   type User {
@@ -69,6 +67,6 @@ var schema = buildSchema(`
   type Mutation {
     createMeeting(params: MeetingInput): Meeting
   }
-`);
+`;
 
-module.exports = schema;
+module.exports = makeExecutableSchema({typeDefs, resolvers});

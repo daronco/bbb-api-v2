@@ -21,11 +21,6 @@ class User {
   }
 }
 
-var allUsers = [1, 2, 3, 4, 5].map(
-  i => new User({userId: `user-${i}`, fullName: `User ${i}`, uniqueMeetingId: require('./meeting').any().uniqueMeetingId})
-).reduce((acc, item, _) => {
-  acc[item.uniqueUserId] = item;
-  return acc;
-}, {});
+var allUsers = [];
 
 module.exports = User;
