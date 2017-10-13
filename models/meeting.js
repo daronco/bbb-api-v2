@@ -1,5 +1,4 @@
 const database = require('../lib/database');
-var assert = require('assert');
 
 class Meeting {
   constructor(params) {
@@ -24,10 +23,7 @@ class Meeting {
   }
 
   users() {
-    const uniqueMeetingId = this.uniqueMeetingId;
-    return require('./user').all().filter(
-      u => u.uniqueMeetingId === uniqueMeetingId
-    );
+    return require('./user').inMeeting(this.uniqueMeetingId);
   }
 
   static all() {
